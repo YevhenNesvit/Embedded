@@ -1,0 +1,30 @@
+# 1. Папки зборки (Тут лежить сміття компілятора)
+build/
+Debug/
+Release/
+cmake-build-*/
+
+# 2. Тимчасові файли та бінарники
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.map
+*.su
+*.d
+
+# 3. Налаштування VS Code (Там твої шляхи /home/yevhen/..., вони нікому не треба)
+.vscode/
+
+# 4. Кеш CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# 5. Файли системних метаданих (якщо ти колись відкривав це на Mac чи Windows)
+.DS_Store
+Thumbs.db
+
+# 6. CubeMX тимчасові файли (але НЕ .ioc!)
+.mxproject
