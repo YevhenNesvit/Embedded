@@ -3,20 +3,16 @@
 
 #include "stm32f3xx_hal.h"
 
-// Адреса екрану (спробуй 0x7A, якщо 0x78 не спрацює)
 #define SSD1306_I2C_ADDR        0x78
 
-// Розміри екрану
 #define SSD1306_WIDTH           128
 #define SSD1306_HEIGHT          64
 
-// Колір
 typedef enum {
-    Black = 0x00, // Чорний (піксель вимкнено)
-    White = 0x01  // Білий (піксель увімкнено)
+    Black = 0x00,
+    White = 0x01
 } SSD1306_COLOR;
 
-// Функції, якими ми будемо користуватися
 void SSD1306_Init(void);
 void SSD1306_Fill(SSD1306_COLOR color);
 void SSD1306_UpdateScreen(void);

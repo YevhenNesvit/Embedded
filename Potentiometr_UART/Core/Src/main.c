@@ -21,8 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>  // Для sprintf
-#include <string.h> // Для strlen
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,7 +71,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  char msg_buffer[50]; // Місце для тексту
+  char msg_buffer[50];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -109,19 +109,12 @@ int main(void)
     HAL_ADC_PollForConversion(&hadc1, 10);
     uint32_t raw_value = HAL_ADC_GetValue(&hadc1);
     
-    // --- МАГІЯ ЦІЛИХ ЧИСЕЛ ---
-    // 1. Рахуємо напругу в мілівольтах (наприклад 1650 мВ)
-    // Використовуємо 3300 замість 3.3
     uint32_t voltage_mv = (raw_value * 3300) / 4095;
     
-    // 2. Виділяємо Вольти (1650 / 1000 = 1)
     uint32_t vol_int = voltage_mv / 1000;
     
-    // 3. Виділяємо соті частки (1650 % 1000 = 650 -> ділимо на 10 -> 65)
     uint32_t vol_fract = (voltage_mv % 1000) / 10;
 
-    // 4. Друкуємо як два цілих числа через крапку
-    // %02lu означає "мінімум 2 цифри, якщо одна - допиши нуль" (щоб було 1.05, а не 1.5)
     sprintf(msg_buffer, "Raw: %lu | Voltage: %lu.%02lu V\r\n", raw_value, vol_int, vol_fract);
 
     HAL_UART_Transmit(&huart2, (uint8_t*)msg_buffer, strlen(msg_buffer), 100);

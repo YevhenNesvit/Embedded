@@ -103,7 +103,7 @@ int main(void)
   MX_TIM1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1); // Запускаємо мотор
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   SSD1306_Init();
   /* USER CODE END 2 */
 
@@ -114,45 +114,34 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    // --- 1. ЧИТАЄМО ПОТЕНЦІОМЕТР ---
     HAL_ADC_Start(&hadc1);
     HAL_ADC_PollForConversion(&hadc1, 10);
-    uint32_t adc_val = HAL_ADC_GetValue(&hadc1); // Оголошуємо і читаємо змінну тут!
+    uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
     
-    // --- 2. КЕРУЄМО МОТОРОМ ---
-    // Формула для серво (500-2500)
     uint32_t servo_pulse = 500 + (adc_val * 2000 / 4095);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, servo_pulse);
 
-    // --- 3. МАЛЮЄМО НА ЕКРАНІ ---
-    SSD1306_Fill(Black); // Очистити буфер
+    SSD1306_Fill(Black);
     
-    // Пишемо заголовок
     SSD1306_SetCursor(0, 0);
     SSD1306_WriteString("SERVO SYSTEM", White);
     
-    // Пишемо значення АЦП
     char screen_buffer[16];
     sprintf(screen_buffer, "Val: %lu", adc_val);
     SSD1306_SetCursor(0, 15);
     SSD1306_WriteString(screen_buffer, White);
 
-    // Малюємо смужку (Progress Bar)
-    // Малюємо рамку (опціонально) або просто лінію
-    // Ширина екрану 128 пікселів. 4095 / 32 ≈ 128.
     uint8_t bar_width = adc_val / 32; 
     
-    // Захист від виходу за межі екрану
     if (bar_width > 128) bar_width = 128;
 
-    // Зафарбовуємо прямокутник (з 30-го по 40-й піксель по вертикалі)
     for(int x = 0; x < bar_width; x++) {
         for(int y = 30; y < 40; y++) {
             SSD1306_DrawPixel(x, y, White);
         }
     }
 
-    SSD1306_UpdateScreen(); // Відправити все на екран
+    SSD1306_UpdateScreen();
     HAL_Delay(50);
   }
   /* USER CODE END 3 */

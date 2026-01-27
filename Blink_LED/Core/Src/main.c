@@ -101,7 +101,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-    HAL_Delay(2000); // 500 мс = пів секунди
+    HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 }

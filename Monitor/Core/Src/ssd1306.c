@@ -1,43 +1,33 @@
 #include "ssd1306.h"
 #include <string.h>
 
-// Використовуємо I2C1 (те, що ми налаштували в CubeMX)
 extern I2C_HandleTypeDef hi2c1;
 
-// Буфер екрану (пам'ять, де ми малюємо перед відправкою)
 static uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 
-// Координати курсору
 static struct {
     uint16_t CurrentX;
     uint16_t CurrentY;
 } SSD1306;
 
-// Простий шрифт 7x10 (скорочена версія для економії місця)
-// Якщо треба більше символів - можна додати пізніше
 static const uint16_t Font7x10[] = {
     0x0000, 0x0000, 0x0000, 0x0000, // пробіл (32)
     0x0000, 0x0006, 0x5F06, 0x0000, // !
     0x0000, 0x0403, 0x0403, 0x0000, // "
     0x0000, 0x7F24, 0x7F24, 0x0000, // #
-    0x0000, 0x0E1F, 0x1F0E, 0x0000, // $ (пропущено багато символів заради стислості)
-    // ТУТ МІНІМАЛЬНИЙ НАБІР ЛІТЕР ТА ЦИФР ДЛЯ ТЕСТУ
-    // (Повний шрифт займає надто багато місця для чату)
+    0x0000, 0x0E1F, 0x1F0E, 0x0000, // $ 
 };
 
-// Функція для відправки команди
 void SSD1306_WriteCommand(uint8_t byte) {
     HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, 100);
 }
 
-// Функція для відправки даних
 void SSD1306_WriteData(uint8_t* buffer, size_t buff_size) {
     HAL_I2C_Mem_Write(&hi2c1, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, 100);
 }
 
-// Ініціалізація екрану (магічна послідовність команд з даташіту)
 void SSD1306_Init(void) {
-    HAL_Delay(100); // Чекаємо поки екран увімкнеться
+    HAL_Delay(100);
     
     SSD1306_WriteCommand(0xAE); // Вимкнути дисплей
     SSD1306_WriteCommand(0x20); // Режим пам'яті
@@ -72,12 +62,10 @@ void SSD1306_Init(void) {
     SSD1306_UpdateScreen();
 }
 
-// Залити екран кольором
 void SSD1306_Fill(SSD1306_COLOR color) {
     memset(SSD1306_Buffer, (color == Black) ? 0x00 : 0xFF, sizeof(SSD1306_Buffer));
 }
 
-// Відправити буфер на екран
 void SSD1306_UpdateScreen(void) {
     for (uint8_t i = 0; i < 8; i++) {
         SSD1306_WriteCommand(0xB0 + i);
@@ -87,7 +75,6 @@ void SSD1306_UpdateScreen(void) {
     }
 }
 
-// Намалювати піксель
 void SSD1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
     if (x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT) return;
     if (color == White) {
@@ -97,15 +84,12 @@ void SSD1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
     }
 }
 
-// Встановити курсор
 void SSD1306_SetCursor(uint8_t x, uint8_t y) {
     SSD1306.CurrentX = x;
     SSD1306.CurrentY = y;
 }
 
-// Примітивна функція друку літер (стандартний 5x7 шрифт вбудований в логіку)
 char SSD1306_WriteChar(char ch, SSD1306_COLOR color) {
-    // Вбудований міні-шрифт 5x7 для економії місця
     static const uint8_t Font5x7[] = {
         0x3E, 0x51, 0x49, 0x45, 0x3E, // 0
         0x00, 0x42, 0x7F, 0x40, 0x00, // 1
@@ -117,11 +101,9 @@ char SSD1306_WriteChar(char ch, SSD1306_COLOR color) {
         0x01, 0x71, 0x09, 0x05, 0x03, // 7
         0x36, 0x49, 0x49, 0x49, 0x36, // 8
         0x06, 0x49, 0x49, 0x29, 0x1E, // 9
-        // Букви можна додати, але для тесту цифр досить
     };
 
     uint32_t b;
-    // Якщо це цифра 0-9
     if (ch >= '0' && ch <= '9') {
         for (int i = 0; i < 5; i++) {
             b = Font5x7[(ch - '0') * 5 + i];
@@ -132,7 +114,6 @@ char SSD1306_WriteChar(char ch, SSD1306_COLOR color) {
         }
         SSD1306.CurrentX += 6;
     } 
-    // Якщо це просто крапка чи пробіл
     else {
         SSD1306.CurrentX += 4; 
     }

@@ -21,8 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>  // Для sprintf
-#include <string.h> // Для strlen
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -74,7 +74,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  char msg_buffer[50]; // Місце для тексту
+  char msg_buffer[50];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -109,25 +109,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    // --- 1. Читаємо Потенціометр (Очі) ---
     HAL_ADC_Start(&hadc1);
     HAL_ADC_PollForConversion(&hadc1, 10);
-    uint32_t adc_val = HAL_ADC_GetValue(&hadc1); // Число від 0 до 4095
-    
-    // --- 2. Рахуємо математику (Мозок) ---
-    // Нам треба діапазон імпульсу від 500 до 2500.
-    // Ширина діапазону = 2000.
-    // Важливо: СПОЧАТКУ множимо, ПОТІМ ділимо, щоб не втратити точність!
+    uint32_t adc_val = HAL_ADC_GetValue(&hadc1);
     
     uint32_t servo_pulse = 500 + (adc_val * 2000 / 4095);
 
-    // --- 3. Крутимо мотором (М'язи) ---
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, servo_pulse);
-
-    // --- 4. Звіт у термінал (Телеметрія) ---
-    // Виводимо вхідне значення і вихідний імпульс
-    // sprintf(msg_buffer, "ADC: %4lu  ->  Pulse: %4lu\r\n", adc_val, servo_pulse);
-    // HAL_UART_Transmit(&huart2, (uint8_t*)msg_buffer, strlen(msg_buffer), 100);
   }
   /* USER CODE END 3 */
 }

@@ -102,13 +102,10 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET)
     {
-        // Вмикаємо діод (подаємо 1)
-        // УВАГА: Заміни GPIO_PIN_6 на GPIO_PIN_0, якщо ти переставив дріт у A0!
         HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_SET); 
     }
     else
     {
-        // Вимикаємо діод (подаємо 0)
         HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_RESET);
     }
   }

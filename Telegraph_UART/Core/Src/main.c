@@ -21,8 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>  // Для sprintf
-#include <string.h> // Для strlen
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,8 +68,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  char msg_buffer[50]; // Місце для тексту
-  int count = 0;       // Лічильник повідомлень
+  char msg_buffer[50];
+  int count = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -102,23 +102,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    count++; // Рахуємо: 1, 2, 3...
+    count++;
 
-    // 1. Формуємо текст. %d заміниться на число count.
-    // \r\n - це перехід на новий рядок (як Enter)
     sprintf(msg_buffer, "Hello from STM32! Count: %d\r\n", count);
 
-    // 2. Відправляємо текст у комп'ютер
-    // &huart2 - через який порт
-    // (uint8_t*)msg_buffer - що відправляти
-    // strlen(msg_buffer) - скільки букв відправляти
-    // 100 - скільки чекати (таймаут)
     HAL_UART_Transmit(&huart2, (uint8_t*)msg_buffer, strlen(msg_buffer), 100);
 
-    // 3. Блимаємо діодом, щоб бачити, що плата жива
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 
-    // 4. Чекаємо 1 секунду
     HAL_Delay(1000);
   }
   /* USER CODE END 3 */
