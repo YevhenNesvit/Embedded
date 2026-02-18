@@ -141,8 +141,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  float Kp = 0.03;   // Базова реакція
-  float Ki = 0.02;  // Повільне, але точне вирівнювання (вже не 0.2!)
+  float Kp = 3.0;   // Базова реакція
+  float Ki = 0.5;  // Повільне, але точне вирівнювання (вже не 0.2!)
   // float Kd = 0.0;    // Гальмування різких рухів
 
   // Змінні пам'яті
@@ -153,15 +153,27 @@ int main(void)
   {
     if (HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDR, 0x3B, 1, rec_data, 2, 100) == HAL_OK)
     {
+        // 1. Зчитуємо сирі дані
         Accel_X_RAW = (int16_t)(rec_data[0] << 8 | rec_data[1]);
 
-        // 1. ПОСИЛЕНИЙ ФІЛЬТР
-        // Беремо 96% старого і лише 4% нового.
-        // Це зробить реакцію трішки повільнішою, але дуже плавною.
-        Filtered_Angle = (Filtered_Angle * 0.96) + (Accel_X_RAW * 0.04);
+        // 2. ПЕРЕТВОРЮЄМО В ГРАДУСИ ОДРАЗУ ТУТ!
+        // Ділимо на 16384 і множимо на 90. 
+        // Захист: якщо значення трохи вийде за 1g через шум, обмежуємо його.
+        float current_g = (float)Accel_X_RAW / 16384.0f;
+        if (current_g > 1.0f) current_g = 1.0f;
+        if (current_g < -1.0f) current_g = -1.0f;
+        float angle_degrees = asinf(current_g) * 57.2957f; // 180 / PI
 
-        int target = 0; 
-        float error = target - Filtered_Angle;
+        // 2. Швидкий фільтр (реакція майже миттєва)
+        Filtered_Angle = (Filtered_Angle * 0.7f) + (angle_degrees * 0.3f);
+
+        // 3. Розрахунок помилки
+        float error = 0.0f - Filtered_Angle; // Ми хочемо тримати 0 градусів (горизонт)
+
+        // 4. Інтеграл із захистом від "намотування" (Anti-Windup)
+        integral += error;
+        if (integral > 200.0f) integral = 200.0f;   // Обмеження!
+        if (integral < -200.0f) integral = -200.0f; // Обмеження!
 
         // 2. PID - Інтеграл
         integral = integral + error;

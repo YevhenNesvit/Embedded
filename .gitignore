@@ -51,3 +51,5 @@ Thumbs.db
 # Тимчасові файли
 *.swp
 *~
+
+secrets.h
